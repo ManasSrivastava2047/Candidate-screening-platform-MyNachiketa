@@ -1,0 +1,4 @@
+s_no,name,email,college,branch,cgpa,best_ai_project,research_work,github,resume
+1,Alice Sharma,alice@example.com,IIT Delhi,Computer Science,8.7,RAG chatbot for legal Q&A,Transformer fine-tuning paper,https://github.com/alicesharma,https://drive.google.com/file/d/sample1/view
+2,Bob Kumar,bob@example.com,NIT Trichy,AI & ML,8.2,LLaMA-2 sentiment analysis,None,https://github.com/bobkumar,https://drive.google.com/file/d/sample2/view
+3,Carol D'Souza,carol@example.com,VIT Vellore,Computer Science,7.9,YOLOv8 warehouse detection,Federated learning research,https://github.com/caroldsouza,https://drive.google.com/file/d/sample3/view

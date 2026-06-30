@@ -1,0 +1,65 @@
+Machine Learning Engineer (Fresher)
+
+Location: Bengaluru, India (Hybrid)
+Experience: 0–1 Years (Freshers Welcome)
+Employment Type: Full-Time
+
+About the Role
+
+We are looking for a passionate and motivated Machine Learning Engineer (Fresher) to join our AI team. You will work alongside experienced data scientists and software engineers to build, train, evaluate, and deploy machine learning models that solve real-world business problems. This role is ideal for candidates with strong Python programming skills and hands-on machine learning projects.
+
+Key Responsibilities
+Collect, clean, and preprocess structured and unstructured datasets.
+Build, train, and evaluate machine learning models.
+Perform feature engineering and exploratory data analysis (EDA).
+Implement classification, regression, clustering, and recommendation algorithms.
+Work with deep learning frameworks for AI applications.
+Deploy ML models using REST APIs or cloud services.
+Monitor model performance and improve prediction accuracy.
+Collaborate with software engineers and data scientists on production-ready AI solutions.
+Maintain documentation for datasets, experiments, and model performance.
+Stay updated with the latest developments in AI, Machine Learning, and Generative AI.
+Required Skills
+Bachelor's or Master's degree in Computer Science, Artificial Intelligence, Data Science, Information Technology, or a related field.
+Strong programming skills in Python.
+Knowledge of NumPy, Pandas, Matplotlib, and Scikit-learn.
+Understanding of Machine Learning algorithms:
+Linear Regression
+Logistic Regression
+Decision Trees
+Random Forest
+Support Vector Machines (SVM)
+K-Means Clustering
+Naive Bayes
+Good understanding of statistics, probability, and linear algebra.
+Knowledge of SQL and database fundamentals.
+Familiarity with Git and version control.
+Strong analytical and problem-solving skills.
+Good communication and teamwork abilities.
+Preferred Skills
+Experience with TensorFlow, PyTorch, or Keras.
+Knowledge of Deep Learning and Neural Networks.
+Familiarity with NLP, Computer Vision, or Generative AI.
+Experience with Flask or FastAPI for model deployment.
+Knowledge of Docker and cloud platforms (AWS, Azure, or Google Cloud).
+Participation in Kaggle competitions, hackathons, or open-source projects.
+Internship or academic projects in AI/ML.
+Qualifications
+B.E./B.Tech./M.Tech./MCA/M.Sc. in Computer Science, AI, Data Science, Information Technology, or a related discipline.
+0–1 years of experience.
+Fresh graduates with strong academic or personal AI/ML projects are encouraged to apply.
+What We Offer
+Competitive salary and performance bonus.
+Mentorship from experienced AI engineers.
+Exposure to real-world Machine Learning and Deep Learning projects.
+Learning and certification opportunities.
+Career growth in AI and Data Science.
+Flexible work environment.
+Health insurance and employee wellness programs.
+Technical Skills
+Programming: Python, SQL
+Libraries: NumPy, Pandas, Matplotlib, Scikit-learn
+Deep Learning: TensorFlow, PyTorch, Keras
+Deployment: Flask, FastAPI
+Tools: Git, Jupyter Notebook, Docker
+Cloud (Preferred): AWS, Azure, Google Cloud

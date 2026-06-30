@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visl Recruit</title>
+  <link rel="stylesheet" href="/static/css/style.css?v=20" />
+</head>
+<body>
+  <div class="layout">
+    <header class="page-header">
+      <p class="tag">Visl AI Labs</p>
+      <h1>Candidate Screening</h1>
+    </header>
+
+    <nav class="step-nav" id="stepNav" aria-label="Pipeline steps">
+      <button type="button" class="step-tab active" data-step="1">
+        <span class="step-num">1</span>
+        <span class="step-label">Upload</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="2">
+        <span class="step-num">2</span>
+        <span class="step-label">JD</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="3">
+        <span class="step-num">3</span>
+        <span class="step-label">Resumes</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="4">
+        <span class="step-num">4</span>
+        <span class="step-label">Evaluate</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="5">
+        <span class="step-num">5</span>
+        <span class="step-label">GitHub</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="6">
+        <span class="step-num">6</span>
+        <span class="step-label">Academic</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="7">
+        <span class="step-num">7</span>
+        <span class="step-label">Rank</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="8">
+        <span class="step-num">8</span>
+        <span class="step-label">Shortlist</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="9">
+        <span class="step-num">9</span>
+        <span class="step-label">Emails</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="10">
+        <span class="step-num">10</span>
+        <span class="step-label">Results</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="11">
+        <span class="step-num">11</span>
+        <span class="step-label">Rescore</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="12">
+        <span class="step-num">12</span>
+        <span class="step-label">Google</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="13">
+        <span class="step-num">13</span>
+        <span class="step-label">Schedule</span>
+      </button>
+      <span class="step-connector" aria-hidden="true"></span>
+      <button type="button" class="step-tab" data-step="14">
+        <span class="step-num">14</span>
+        <span class="step-label">Invite</span>
+      </button>
+    </nav>
+
+    <section class="step-workspace card">
+      <div class="step-panel active" id="stepPanel1" data-step="1">
+        <div class="step-loader hidden" id="loader1"><div class="spinner"></div><span>Uploading…</span></div>
+        <h2>Upload Candidates</h2>
+        <p class="hint-block">Upload your spreadsheet to begin the screening pipeline.</p>
+        <div class="drop" id="dropZone">
+          <p>Drop file here or click to browse</p>
+          <p class="hint">CSV · XLS · XLSX</p>
+        </div>
+        <input type="file" id="fileInput" accept=".csv,.xls,.xlsx,.xlsm" hidden />
+        <button type="button" id="browseBtn" class="btn primary" style="margin-top:.75rem">Choose File</button>
+        <p id="uploadStatus" class="status"></p>
+      </div>
+
+      <div class="step-panel" id="stepPanel2" data-step="2">
+        <div class="step-loader hidden" id="loader2"><div class="spinner"></div><span>Saving JD…</span></div>
+        <h2>Job Description</h2>
+        <p class="hint-block">Paste the role description used for AI and relevance scoring.</p>
+        <textarea id="jdInput" rows="8" placeholder="Paste job description here…"></textarea>
+        <div class="row" style="margin-top:.75rem">
+          <button id="saveJdBtn" class="btn primary">Save JD</button>
+          <span id="jdStatus" class="status"></span>
+        </div>
+      </div>
+
+      <div class="step-panel" id="stepPanel3" data-step="3">
+        <div class="step-loader hidden" id="loader3"><div class="spinner"></div><span>Processing resumes…</span></div>
+        <h2>Process Resumes</h2>
+        <p class="hint-block">Download and parse PDF resumes from each candidate link.</p>
+        <button id="processResumesBtn" class="btn primary">Process All Resumes</button>
+        <span id="resumeStatus" class="status" style="margin-left:.75rem"></span>
+      </div>
+
+      <div class="step-panel" id="stepPanel4" data-step="4">
+        <div class="step-loader hidden" id="loader4"><div class="spinner"></div><span>AI evaluating…</span></div>
+        <h2>AI Evaluation (Groq)</h2>
+        <p class="hint-block">Score each candidate against the JD and their project work.</p>
+        <button id="evaluateBtn" class="btn primary">Run AI Evaluation</button>
+        <span id="evaluateStatus" class="status" style="margin-left:.75rem"></span>
+      </div>
+
+      <div class="step-panel" id="stepPanel5" data-step="5">
+        <div class="step-loader hidden" id="loader5"><div class="spinner"></div><span>Analyzing GitHub…</span></div>
+        <h2>GitHub Analysis</h2>
+        <p class="hint-block">Fetch repos and score technical portfolio fit with Groq.</p>
+        <button id="githubBtn" class="btn primary">Analyze GitHub Profiles</button>
+        <span id="githubStatus" class="status" style="margin-left:.75rem"></span>
+      </div>
+
+      <div class="step-panel" id="stepPanel6" data-step="6">
+        <div class="step-loader hidden" id="loader6"><div class="spinner"></div><span>Scoring academics…</span></div>
+        <h2>Academic Scoring</h2>
+        <p class="hint-block">CGPA ÷ 10 plus a small college/branch relevance bonus (pure Python).</p>
+        <button id="academicBtn" class="btn primary">Run Academic Scoring</button>
+        <span id="academicStatus" class="status" style="margin-left:.75rem"></span>
+      </div>
+
+      <div class="step-panel" id="stepPanel7" data-step="7">
+        <div class="step-loader hidden" id="loader7"><div class="spinner"></div><span>Calculating ranks…</span></div>
+        <h2>Composite Scoring &amp; Ranking</h2>
+        <p class="hint-block">
+          Weighted score: JD 30% · GitHub 25% · Test 25% (0 until results uploaded) · CGPA 10% · Project 10%.
+          Candidates are sorted highest to lowest.
+        </p>
+        <button id="scoreBtn" class="btn primary">Calculate &amp; Rank</button>
+        <span id="scoreStatus" class="status" style="margin-left:.75rem"></span>
+      </div>
+
+      <div class="step-panel" id="stepPanel8" data-step="8">
+        <div class="step-loader hidden" id="loader8"><div class="spinner"></div><span>Shortlisting…</span></div>
+        <h2>Phase 1 Shortlisting</h2>
+        <p class="hint-block">
+          Shortlist candidates who are in the <strong>top 5</strong> by rank <em>or</em> have a composite score <strong>&ge; 60%</strong>.
+          Others remain as <em>applied</em>.
+        </p>
+        <button id="shortlistBtn" class="btn primary">Apply Shortlist</button>
+        <span id="shortlistStatus" class="status" style="margin-left:.75rem"></span>
+      </div>
+
+      <div class="step-panel" id="stepPanel9" data-step="9">
+        <div class="step-loader hidden" id="loader9"><div class="spinner"></div><span>Sending emails…</span></div>
+        <h2>Test Invitation Emails</h2>
+        <p class="hint-block">
+          Sends a templated assessment email via SMTP to every <strong>shortlisted</strong> candidate.
+          Uses <code>TEST_LINK_URL</code> from your <code>.env</code> file.
+        </p>
+        <button id="sendEmailsBtn" class="btn primary">Send Test Emails</button>
+        <span id="emailStatus" class="status" style="margin-left:.75rem"></span>
+      </div>
+
+      <div class="step-panel" id="stepPanel10" data-step="10">
+        <div class="step-loader hidden" id="loader10"><div class="spinner"></div><span>Importing test scores…</span></div>
+        <h2>Upload Test Results</h2>
+        <p class="hint-block">
+          Upload the <strong>same candidate CSV</strong> or a separate file with
+          <code>email</code>, <code>test_la</code>, <code>test_code</code>.
+          Extra columns are ignored. Scores apply to <strong>shortlisted</strong> candidates only (matched by email).
+        </p>
+        <div class="drop" id="resultsDropZone">
+          <p>Drop file here or click to browse</p>
+          <p class="hint">CSV · XLS · XLSX</p>
+        </div>
+        <input type="file" id="resultsFileInput" accept=".csv,.xls,.xlsx,.xlsm" hidden />
+        <button type="button" id="resultsBrowseBtn" class="btn primary" style="margin-top:.75rem">Choose File</button>
+        <p id="resultsStatus" class="status"></p>
+      </div>
+
+      <div class="step-panel" id="stepPanel11" data-step="11">
+        <div class="step-loader hidden" id="loader11"><div class="spinner"></div><span>Re-scoring…</span></div>
+        <h2>Final Re-scoring &amp; Ranking</h2>
+        <p class="hint-block">
+          Recalculates composite scores <strong>with test results</strong>, re-ranks everyone, then marks
+          <strong>interview</strong> candidates who are top 5 or score &ge; 60% (among those with test scores).
+        </p>
+        <button id="rescoreBtn" class="btn primary">Run Final Re-score</button>
+        <span id="rescoreStatus" class="status" style="margin-left:.75rem"></span>
+      </div>
+
+      <div class="step-panel" id="stepPanel12" data-step="12">
+        <h2>Connect Google Calendar</h2>
+        <p class="hint-block">
+          Your <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> in <code>.env</code> are already used by the app.
+          This button is a <strong>one-time sign-in</strong> with your Google account so the app can create Calendar events and Meet links.
+          You are not being asked to enter client ID/secret again.
+        </p>
+        <p id="googleRedirectHint" class="hint-block" style="margin-top:.5rem;font-size:.85rem"></p>
+        <button id="googleAuthBtn" class="btn primary">Connect Google Account</button>
+        <span id="googleAuthStatus" class="status" style="margin-left:.75rem"></span>
+        <p id="googleConnectedInfo" class="hint-block hidden" style="margin-top:.5rem"></p>
+      </div>
+
+      <div class="step-panel" id="stepPanel13" data-step="13">
+        <div class="step-loader hidden" id="loader13"><div class="spinner"></div><span>Scheduling interviews…</span></div>
+        <h2>Interview Scheduling</h2>
+        <p class="hint-block">
+          Creates a Google Calendar event with a Meet link for each <strong>interview</strong> candidate.
+          Slots are <strong>30 minutes</strong> each, assigned back-to-back. Already-scheduled candidates are skipped.
+        </p>
+        <div class="row" style="margin-top:.5rem; flex-wrap:wrap; gap:.75rem; align-items:center">
+          <label for="scheduleStart" style="font-size:.9rem;color:var(--muted)">First slot (optional)</label>
+          <input type="datetime-local" id="scheduleStart" />
+          <button id="scheduleBtn" class="btn primary">Schedule Interviews</button>
+          <span id="scheduleStatus" class="status"></span>
+        </div>
+        <p class="hint-block" style="margin-top:.5rem">
+          Leave blank to start at the next weekday 10:00 AM (<code>SCHEDULE_TIMEZONE</code> in .env, default Asia/Kolkata).
+        </p>
+      </div>
+
+      <div class="step-panel" id="stepPanel14" data-step="14">
+        <div class="step-loader hidden" id="loader14"><div class="spinner"></div><span>Sending interview invites…</span></div>
+        <h2>Interview Invitation Emails</h2>
+        <p class="hint-block">
+          Sends a templated SMTP email to each scheduled <strong>interview</strong> candidate with
+          interview <strong>date</strong>, <strong>time</strong>, and <strong>Google Meet</strong> link.
+          Candidates must be scheduled in Step 13 first.
+        </p>
+        <button id="sendInterviewEmailsBtn" class="btn primary">Send Interview Emails</button>
+        <span id="interviewEmailStatus" class="status" style="margin-left:.75rem"></span>
+      </div>
+    </section>
+
+    <section class="table-section card">
+      <div class="row">
+        <h2>Candidates <span id="count" class="badge">0</span></h2>
+        <button id="clearBtn" class="btn ghost" hidden>Clear</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Rank</th><th>Name</th><th>Email</th><th>College</th><th>Branch</th>
+              <th>CGPA</th><th>AI Project</th><th>Research</th>
+              <th>GitHub</th><th>Resume</th><th>Parsed</th>
+              <th>JD</th><th>Project</th><th>GitHub</th><th>Academic</th><th>Test</th><th>Composite</th><th>Status</th><th class="reasoning-col">Remarks</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="20" class="empty">No candidates yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <div id="remarksPopover" class="remarks-popover hidden" role="dialog" aria-labelledby="remarksTitle">
+    <div class="remarks-popover-header">
+      <strong id="remarksTitle">Remarks</strong>
+      <button type="button" id="remarksClose" class="remarks-close" aria-label="Close">&times;</button>
+    </div>
+    <div id="remarksBody" class="remarks-popover-body"></div>
+  </div>
+
+  <script src="/static/js/app.js?v=20"></script>
+</body>
+</html>

@@ -26,6 +26,10 @@ load_dotenv(Path(__file__).resolve().parent / ".env", override=True)
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY") or "visl-recruit-dev-key"
 
+if os.getenv("RENDER") or os.getenv("FLASK_ENV") == "production":
+    app.config["SESSION_COOKIE_SECURE"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+
 app.register_blueprint(upload_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(health_bp)

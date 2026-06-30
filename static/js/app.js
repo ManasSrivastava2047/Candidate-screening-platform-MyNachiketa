@@ -251,7 +251,7 @@
   }
 
   async function api(url, opts) {
-    const res = await fetch(url, opts);
+    const res = await fetch(url, { credentials: "same-origin", ...opts });
     let data;
     try { data = await res.json(); } catch { data = {}; }
     if (!res.ok) throw new Error(data.error || data.errors?.join("; ") || `Request failed (${res.status})`);

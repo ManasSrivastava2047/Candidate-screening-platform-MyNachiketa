@@ -7,7 +7,7 @@ from utils.store import clear_google_credentials, get_google_account, set_google
 
 auth_bp = Blueprint("auth", __name__)
 
-if os.getenv("FLASK_ENV") != "production":
+if os.getenv("FLASK_ENV") != "production" and not os.getenv("RENDER"):
     os.environ.setdefault("OAUTHLIB_INSECURE_TRANSPORT", "1")
 
 

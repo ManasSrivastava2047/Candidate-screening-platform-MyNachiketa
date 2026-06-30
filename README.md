@@ -213,9 +213,44 @@ Copy `.env.example` to `.env` and configure:
 ├── static/css/style.css
 ├── static/js/app.js       # Frontend logic
 ├── requirements.txt
+├── Procfile               # Render / production start command
+├── render.yaml            # Optional Render blueprint
+├── runtime.txt            # Python version for Render
 ├── .env.example
 └── start.bat              # Windows quick start
 ```
+
+## Deploy on Render
+
+### 1. Push to GitHub
+
+Ensure `.env` is **not** committed. Then push the repo to GitHub.
+
+### 2. Create a Render Web Service
+
+1. [render.com](https://render.com) → **New +** → **Web Service** → connect your repo  
+2. Render can auto-detect settings from `render.yaml` and `Procfile`, or set manually:
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `gunicorn --bind 0.0.0.0:$PORT --timeout 120 app:app`
+3. Add environment variables from `.env.example` (copy values from your local `.env`)
+
+### 3. Required env vars on Render
+
+Set at minimum: `GROQ_API_KEY`, `FLASK_SECRET_KEY`, `FLASK_ENV=production`, SMTP vars, and Google OAuth vars.
+
+Update Google for production:
+
+```
+GOOGLE_REDIRECT_URI=https://YOUR-SERVICE.onrender.com/auth/google/callback
+```
+
+Add that **exact** URI in Google Cloud Console → OAuth client → **Authorized redirect URIs**.
+
+### 4. Notes
+
+- Free tier sleeps when idle; first load may be slow.
+- Candidate data is in-memory and resets on restart.
+- Health check: `/api/health`
 
 ## License
 

@@ -15,6 +15,7 @@ def process_resumes():
     ok, failed, skipped = 0, 0, 0
     for c in candidates:
         process_candidate_resume(c)
+        set_candidates(candidates)
         status = c.get("resume_status")
         if status == "ok":
             ok += 1

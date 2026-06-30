@@ -1,7 +1,25 @@
+import json
+import os
 import uuid
-from flask import session
+from pathlib import Path
 
-_stores: dict[str, dict] = {}
+from flask import g, session
+
+_STORE_CACHE_KEY = "visl_store"
+
+
+def _store_dir() -> Path:
+    custom = os.getenv("STORE_DIR", "").strip()
+    if custom:
+        return Path(custom)
+    if os.getenv("RENDER"):
+        return Path("/tmp/visl-recruit-stores")
+    return Path(__file__).resolve().parent.parent / "data" / "stores"
+
+
+def _store_path(sid: str) -> Path:
+    safe = "".join(c for c in sid if c.isalnum() or c == "-")
+    return _store_dir() / f"{safe}.json"
 
 
 def _default_store() -> dict:
@@ -13,13 +31,37 @@ def _default_store() -> dict:
     }
 
 
-def get_store() -> dict:
+def _ensure_sid() -> str:
     if "sid" not in session:
         session["sid"] = str(uuid.uuid4())
-    sid = session["sid"]
-    if sid not in _stores:
-        _stores[sid] = _default_store()
-    return _stores[sid]
+        session.modified = True
+    return session["sid"]
+
+
+def _load(sid: str) -> dict:
+    path = _store_path(sid)
+    if not path.exists():
+        return _default_store()
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(data, dict):
+            return {**_default_store(), **data}
+    except (OSError, json.JSONDecodeError):
+        pass
+    return _default_store()
+
+
+def _persist(store: dict) -> None:
+    sid = _ensure_sid()
+    directory = _store_dir()
+    directory.mkdir(parents=True, exist_ok=True)
+    _store_path(sid).write_text(json.dumps(store), encoding="utf-8")
+
+
+def get_store() -> dict:
+    if getattr(g, _STORE_CACHE_KEY, None) is None:
+        setattr(g, _STORE_CACHE_KEY, _load(_ensure_sid()))
+    return getattr(g, _STORE_CACHE_KEY)
 
 
 def get_candidates() -> list[dict]:
@@ -27,11 +69,15 @@ def get_candidates() -> list[dict]:
 
 
 def set_candidates(data: list[dict]) -> None:
-    get_store()["candidates"] = data
+    store = get_store()
+    store["candidates"] = data
+    _persist(store)
 
 
 def clear_candidates() -> None:
-    get_store()["candidates"] = []
+    store = get_store()
+    store["candidates"] = []
+    _persist(store)
 
 
 def get_jd() -> str:
@@ -39,7 +85,9 @@ def get_jd() -> str:
 
 
 def set_jd(text: str) -> None:
-    get_store()["job_description"] = text
+    store = get_store()
+    store["job_description"] = text
+    _persist(store)
 
 
 def get_google_account() -> dict | None:
@@ -54,9 +102,11 @@ def set_google_credentials(creds: dict, email: str = "") -> None:
     store = get_store()
     store["google_credentials"] = creds
     store["google_email"] = email
+    _persist(store)
 
 
 def clear_google_credentials() -> None:
     store = get_store()
     store["google_credentials"] = None
     store["google_email"] = ""
+    _persist(store)

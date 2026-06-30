@@ -715,17 +715,19 @@
 
     updateStepNav();
 
-    fetch("/api/health").then((r) => r.json()).then((d) => {
+    const fetchOpts = { credentials: "same-origin" };
+
+    fetch("/api/health", fetchOpts).then((r) => r.json()).then((d) => {
       console.log("Server:", d.status);
     }).catch(() => {
       setStatus($("uploadStatus"), "Server not reachable — run: python app.py", "err");
     });
 
     Promise.all([
-      fetch("/api/candidates").then((r) => r.json()).catch(() => ({})),
-      fetch("/api/jd").then((r) => r.json()).catch(() => ({})),
-      fetch("/api/pipeline").then((r) => r.json()).catch(() => ({})),
-      fetch("/api/google/status").then((r) => r.json()).catch(() => ({})),
+      fetch("/api/candidates", fetchOpts).then((r) => r.json()).catch(() => ({})),
+      fetch("/api/jd", fetchOpts).then((r) => r.json()).catch(() => ({})),
+      fetch("/api/pipeline", fetchOpts).then((r) => r.json()).catch(() => ({})),
+      fetch("/api/google/status", fetchOpts).then((r) => r.json()).catch(() => ({})),
     ]).then(([candData, jdData, pipeData, googleData]) => {
       if (candData.candidates?.length) render(candData.candidates);
       if (jdData.jd) {

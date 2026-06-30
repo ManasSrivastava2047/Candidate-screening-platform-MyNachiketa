@@ -1,6 +1,6 @@
 # Visl Recruit — AI Candidate Screening Platform
 
-An end-to-end recruiting pipeline for Visl AI Labs. Upload candidate spreadsheets, score them with Groq AI and GitHub analysis, shortlist top performers, run assessments, and schedule interviews with Google Calendar and Meet.
+An end-to-end recruiting pipeline for Visl AI Labs. Upload candidate spreadsheets, score them with Groq AI and GitHub analysis, shortlist top performers, run assessments, and send interview invitations with scheduled slots and Meet links.
 
 ## Tech Stack
 
@@ -12,7 +12,6 @@ An end-to-end recruiting pipeline for Visl AI Labs. Upload candidate spreadsheet
 | Resume parsing | pdfplumber |
 | GitHub analysis | GitHub REST API + Groq |
 | Email | smtplib (test + interview invites) |
-| Scheduling | Google Calendar API + Google Meet |
 | Data | pandas (CSV / XLS / XLSX) |
 
 ## Workflow
@@ -23,8 +22,7 @@ The app guides you through a linear pipeline. Each step unlocks the next once co
 Upload candidates → Job description → Parse resumes → AI evaluation
        → GitHub analysis → Academic scoring → Rank & composite score
               → Shortlist → Test emails → Upload test results
-                     → Final re-score → Google sign-in → Schedule interviews
-                              → Send interview invites
+                     → Final re-score + interview invites
 ```
 
 ### 1. Upload candidates
@@ -93,21 +91,16 @@ test_score = (test_la × 0.4 + test_code × 0.6) / 100
 
 The table re-ranks automatically after merge.
 
-### 11. Final re-score
+### 11. Final re-score & interview invites
 
-Recalculates composite scores with test results included, re-ranks everyone, and marks **interview** candidates who (among those with test scores in the pipeline) are **top 5** or score **≥ 60%**.
+One step that:
 
-### 12. Google Calendar sign-in
+1. Recalculates composite scores with test results and re-ranks everyone  
+2. Marks **interview** candidates (top 5 or ≥ 60% among pipeline candidates with test scores)  
+3. Assigns **30-minute** sequential interview slots  
+4. Sends SMTP interview invitation emails with **date**, **time**, and **Meet link**
 
-Your `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env` identify the app. You still click **Connect Google Account** once to authorize Calendar access for your Google account.
-
-### 13. Interview scheduling
-
-Creates Google Calendar events with Meet links for each **interview** candidate. Slots are **30 minutes**, assigned back-to-back. Optional start time; default is next weekday 10:00 AM in `SCHEDULE_TIMEZONE`.
-
-### 14. Interview invitation emails
-
-SMTP emails to scheduled candidates with interview date, time, and Meet link.
+Set `INTERVIEW_MEET_LINK` in `.env` to your Google Meet room URL (create one manually at [meet.google.com](https://meet.google.com)). Optional first slot datetime in the UI; default is next weekday 10:00 AM in `SCHEDULE_TIMEZONE`.
 
 ## Candidate status flow
 
@@ -117,13 +110,11 @@ applied → shortlisted → test_sent → interview
 
 ## Key points
 
-- **Session-based storage** — candidate data lives in server memory per browser session. Restarting the server clears progress.
+- **Session-based file storage** — candidate data persists per browser session on disk.
 - **Groq API key** must start with `gsk_`.
 - **GitHub token** is optional but improves rate limits.
 - **SMTP** uses Gmail App Passwords or any SMTP provider.
-- **Google OAuth** requires a **Web application** client. Add both redirect URIs in Google Cloud Console if needed:
-  - `http://127.0.0.1:5000/auth/google/callback`
-  - `http://localhost:5000/auth/google/callback`
+- **INTERVIEW_MEET_LINK** — a single Meet URL used for all interview invites (no Google Calendar API).
 - **Empty optional fields** are stored as `NA`, not skipped.
 - **Remarks** in the table open in a popover (JD, project, GitHub, academic reasoning).
 
@@ -133,7 +124,8 @@ applied → shortlisted → test_sent → interview
 
 - Python 3.10+
 - Groq API key  
-- (Optional) GitHub token, SMTP credentials, Google OAuth client
+- SMTP credentials  
+- A Google Meet link for interview invites
 
 ### Install and run
 
@@ -160,9 +152,7 @@ Copy `.env.example` to `.env` and configure:
 | `GROQ_API_KEY` | Groq API (required) |
 | `FLASK_SECRET_KEY` | Flask session signing (quote if value contains `#`) |
 | `GITHUB_TOKEN` | GitHub API rate limit (optional) |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
-| `GOOGLE_REDIRECT_URI` | Must match Google Cloud Console exactly |
+| `INTERVIEW_MEET_LINK` | Google Meet URL for interview emails (required for Step 11) |
 | `SCHEDULE_TIMEZONE` | Timezone for interview slots (default `Asia/Kolkata`) |
 | `SMTP_HOST` | SMTP server (default `smtp.gmail.com`) |
 | `SMTP_PORT` | SMTP port (default `587`) |
@@ -171,14 +161,6 @@ Copy `.env.example` to `.env` and configure:
 | `TEST_LINK_URL` | Assessment link in test invitation emails |
 
 **Never commit `.env` to git** — it is listed in `.gitignore`.
-
-### Google OAuth setup
-
-1. [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services** → **Credentials**
-2. Create an **OAuth 2.0 Client ID** (type: **Web application**)
-3. Enable **Google Calendar API**
-4. Under **Authorized redirect URIs**, add the value of `GOOGLE_REDIRECT_URI` from your `.env`
-5. If sign-in fails with `redirect_uri_mismatch`, ensure the URI matches **character-for-character** (including `127.0.0.1` vs `localhost`)
 
 ## API overview
 
@@ -195,11 +177,7 @@ Copy `.env.example` to `.env` and configure:
 | `POST` | `/api/shortlist` | Apply shortlist rules |
 | `POST` | `/api/send-test-emails` | Send assessment invitations |
 | `POST` | `/api/upload-results` | Merge test scores from spreadsheet |
-| `POST` | `/api/rescore` | Final ranking + interview marking |
-| `GET` | `/auth/google` | Start Google OAuth |
-| `GET` | `/api/google/status` | OAuth connection status |
-| `POST` | `/api/schedule` | Create Calendar events + Meet links |
-| `POST` | `/api/send-interview-emails` | Send interview invitations |
+| `POST` | `/api/rescore` | Final ranking, slot assignment, interview emails |
 | `GET` | `/api/pipeline` | Pipeline progress for UI |
 | `GET` | `/api/health` | Health check |
 
@@ -208,7 +186,7 @@ Copy `.env.example` to `.env` and configure:
 ```
 ├── app.py                 # Flask entry point
 ├── routes/                # API blueprints
-├── utils/                 # Parsing, scoring, email, calendar logic
+├── utils/                 # Parsing, scoring, email, slot logic
 ├── templates/index.html   # Main UI
 ├── static/css/style.css
 ├── static/js/app.js       # Frontend logic
@@ -231,25 +209,16 @@ Ensure `.env` is **not** committed. Then push the repo to GitHub.
 1. [render.com](https://render.com) → **New +** → **Web Service** → connect your repo  
 2. Render can auto-detect settings from `render.yaml` and `Procfile`, or set manually:
    - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `gunicorn --bind 0.0.0.0:$PORT --timeout 120 app:app`
-3. Add environment variables from `.env.example` (copy values from your local `.env`)
+   - **Start Command:** `gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 300 app:app`
+3. Add environment variables from `.env.example`
 
 ### 3. Required env vars on Render
 
-Set at minimum: `GROQ_API_KEY`, `FLASK_SECRET_KEY`, `FLASK_ENV=production`, SMTP vars, and Google OAuth vars.
-
-Update Google for production:
-
-```
-GOOGLE_REDIRECT_URI=https://YOUR-SERVICE.onrender.com/auth/google/callback
-```
-
-Add that **exact** URI in Google Cloud Console → OAuth client → **Authorized redirect URIs**.
+`GROQ_API_KEY`, `FLASK_SECRET_KEY`, `FLASK_ENV=production`, `INTERVIEW_MEET_LINK`, SMTP vars, and `SCHEDULE_TIMEZONE`.
 
 ### 4. Notes
 
 - Free tier sleeps when idle; first load may be slow.
-- Candidate data is in-memory and resets on restart.
 - Health check: `/api/health`
 
 ## License

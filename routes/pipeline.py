@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-from utils.store import get_candidates, get_google_account, get_jd
+from utils.store import get_candidates, get_jd
 
 pipeline_bp = Blueprint("pipeline", __name__)
 
@@ -20,9 +20,6 @@ def pipeline_state():
         "step8_shortlist": any(c.get("status") == "shortlisted" for c in candidates),
         "step9_test_emails": any(c.get("status") == "test_sent" for c in candidates),
         "step10_test_results": any(c.get("test_results_status") == "ok" for c in candidates),
-        "step11_rescore": any(c.get("status") == "interview" for c in candidates),
-        "step12_google": get_google_account() is not None,
-        "step13_schedule": any(c.get("schedule_status") == "scheduled" for c in candidates),
-        "step14_interview_emails": any(c.get("interview_email_status") == "sent" for c in candidates),
+        "step11_rescore": any(c.get("interview_email_status") == "sent" for c in candidates),
         "candidate_count": len(candidates),
     })

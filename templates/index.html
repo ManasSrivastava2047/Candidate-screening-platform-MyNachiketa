@@ -68,21 +68,6 @@
         <span class="step-num">11</span>
         <span class="step-label">Rescore</span>
       </button>
-      <span class="step-connector" aria-hidden="true"></span>
-      <button type="button" class="step-tab" data-step="12">
-        <span class="step-num">12</span>
-        <span class="step-label">Google</span>
-      </button>
-      <span class="step-connector" aria-hidden="true"></span>
-      <button type="button" class="step-tab" data-step="13">
-        <span class="step-num">13</span>
-        <span class="step-label">Schedule</span>
-      </button>
-      <span class="step-connector" aria-hidden="true"></span>
-      <button type="button" class="step-tab" data-step="14">
-        <span class="step-num">14</span>
-        <span class="step-label">Invite</span>
-      </button>
     </nav>
 
     <section class="step-workspace card">
@@ -193,57 +178,23 @@
       </div>
 
       <div class="step-panel" id="stepPanel11" data-step="11">
-        <div class="step-loader hidden" id="loader11"><div class="spinner"></div><span>Re-scoring…</span></div>
-        <h2>Final Re-scoring &amp; Ranking</h2>
+        <div class="step-loader hidden" id="loader11"><div class="spinner"></div><span>Re-scoring &amp; sending invites…</span></div>
+        <h2>Final Re-scoring &amp; Interview Invites</h2>
         <p class="hint-block">
-          Recalculates composite scores <strong>with test results</strong>, re-ranks everyone, then marks
-          <strong>interview</strong> candidates who are top 5 or score &ge; 60% (among those with test scores).
+          Recalculates composite scores <strong>with test results</strong>, re-ranks everyone, marks
+          <strong>interview</strong> candidates (top 5 or &ge; 60%), assigns <strong>30-minute</strong> slots,
+          and sends interview invitation emails with date, time, and Meet link via SMTP.
         </p>
-        <button id="rescoreBtn" class="btn primary">Run Final Re-score</button>
-        <span id="rescoreStatus" class="status" style="margin-left:.75rem"></span>
-      </div>
-
-      <div class="step-panel" id="stepPanel12" data-step="12">
-        <h2>Connect Google Calendar</h2>
-        <p class="hint-block">
-          Your <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> in <code>.env</code> are already used by the app.
-          This button is a <strong>one-time sign-in</strong> with your Google account so the app can create Calendar events and Meet links.
-          You are not being asked to enter client ID/secret again.
-        </p>
-        <p id="googleRedirectHint" class="hint-block" style="margin-top:.5rem;font-size:.85rem"></p>
-        <button id="googleAuthBtn" class="btn primary">Connect Google Account</button>
-        <span id="googleAuthStatus" class="status" style="margin-left:.75rem"></span>
-        <p id="googleConnectedInfo" class="hint-block hidden" style="margin-top:.5rem"></p>
-      </div>
-
-      <div class="step-panel" id="stepPanel13" data-step="13">
-        <div class="step-loader hidden" id="loader13"><div class="spinner"></div><span>Scheduling interviews…</span></div>
-        <h2>Interview Scheduling</h2>
-        <p class="hint-block">
-          Creates a Google Calendar event with a Meet link for each <strong>interview</strong> candidate.
-          Slots are <strong>30 minutes</strong> each, assigned back-to-back. Already-scheduled candidates are skipped.
+        <p class="hint-block" style="font-size:.85rem">
+          Set <code>INTERVIEW_MEET_LINK</code> in <code>.env</code> to your Google Meet room URL.
+          Optional first slot below; default is next weekday 10:00 AM (<code>SCHEDULE_TIMEZONE</code>).
         </p>
         <div class="row" style="margin-top:.5rem; flex-wrap:wrap; gap:.75rem; align-items:center">
-          <label for="scheduleStart" style="font-size:.9rem;color:var(--muted)">First slot (optional)</label>
-          <input type="datetime-local" id="scheduleStart" />
-          <button id="scheduleBtn" class="btn primary">Schedule Interviews</button>
-          <span id="scheduleStatus" class="status"></span>
+          <label for="rescoreStart" style="font-size:.9rem;color:var(--muted)">First interview slot (optional)</label>
+          <input type="datetime-local" id="rescoreStart" />
+          <button id="rescoreBtn" class="btn primary">Run Final Re-score &amp; Send Invites</button>
+          <span id="rescoreStatus" class="status"></span>
         </div>
-        <p class="hint-block" style="margin-top:.5rem">
-          Leave blank to start at the next weekday 10:00 AM (<code>SCHEDULE_TIMEZONE</code> in .env, default Asia/Kolkata).
-        </p>
-      </div>
-
-      <div class="step-panel" id="stepPanel14" data-step="14">
-        <div class="step-loader hidden" id="loader14"><div class="spinner"></div><span>Sending interview invites…</span></div>
-        <h2>Interview Invitation Emails</h2>
-        <p class="hint-block">
-          Sends a templated SMTP email to each scheduled <strong>interview</strong> candidate with
-          interview <strong>date</strong>, <strong>time</strong>, and <strong>Google Meet</strong> link.
-          Candidates must be scheduled in Step 13 first.
-        </p>
-        <button id="sendInterviewEmailsBtn" class="btn primary">Send Interview Emails</button>
-        <span id="interviewEmailStatus" class="status" style="margin-left:.75rem"></span>
       </div>
     </section>
 
@@ -278,6 +229,6 @@
     <div id="remarksBody" class="remarks-popover-body"></div>
   </div>
 
-  <script src="/static/js/app.js?v=22"></script>
+  <script src="/static/js/app.js?v=25"></script>
 </body>
 </html>

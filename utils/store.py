@@ -26,8 +26,6 @@ def _default_store() -> dict:
     return {
         "candidates": [],
         "job_description": "",
-        "google_credentials": None,
-        "google_email": "",
     }
 
 
@@ -87,26 +85,4 @@ def get_jd() -> str:
 def set_jd(text: str) -> None:
     store = get_store()
     store["job_description"] = text
-    _persist(store)
-
-
-def get_google_account() -> dict | None:
-    store = get_store()
-    creds = store.get("google_credentials")
-    if not creds:
-        return None
-    return {"credentials": creds, "email": store.get("google_email", "")}
-
-
-def set_google_credentials(creds: dict, email: str = "") -> None:
-    store = get_store()
-    store["google_credentials"] = creds
-    store["google_email"] = email
-    _persist(store)
-
-
-def clear_google_credentials() -> None:
-    store = get_store()
-    store["google_credentials"] = None
-    store["google_email"] = ""
     _persist(store)

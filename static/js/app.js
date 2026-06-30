@@ -3,7 +3,7 @@
   "use strict";
 
   const $ = (id) => document.getElementById(id);
-  const TOTAL_STEPS = 14;
+  const TOTAL_STEPS = 11;
 
   let currentStep = 1;
   const completedSteps = new Set();
@@ -77,9 +77,6 @@
     if (pipe.step9_test_emails) completedSteps.add(9);
     if (pipe.step10_test_results) completedSteps.add(10);
     if (pipe.step11_rescore) completedSteps.add(11);
-    if (pipe.step12_google) completedSteps.add(12);
-    if (pipe.step13_schedule) completedSteps.add(13);
-    if (pipe.step14_interview_emails) completedSteps.add(14);
 
     let target = TOTAL_STEPS;
     for (let i = 1; i <= TOTAL_STEPS; i++) {
@@ -490,116 +487,28 @@
     const btn = $("rescoreBtn");
     setLoading(11, true);
     btn.disabled = true;
-    try {
-      const data = await api("/api/rescore", { method: "POST" });
-      let msg = data.message;
-      if (data.interview_names?.length) msg += ` — ${data.interview_names.join(", ")}`;
-      setStatus(rescoreStatus, msg, "ok");
-      render(data.candidates);
-      completeStep(11);
-    } catch (e) {
-      setStatus(rescoreStatus, e.message, "err");
-    } finally {
-      btn.disabled = false;
-      setLoading(11, false);
-    }
-  }
 
-  async function runSchedule() {
-    const status = $("scheduleStatus");
-    const btn = $("scheduleBtn");
-    setLoading(13, true);
-    btn.disabled = true;
-
-    const startInput = $("scheduleStart");
+    const startInput = $("rescoreStart");
     const body = {};
     if (startInput?.value) body.start_time = startInput.value;
 
     try {
-      const data = await api("/api/schedule", {
+      const data = await api("/api/rescore", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
       let msg = data.message;
-      const scheduled = data.log?.filter((e) => e.status === "scheduled") || [];
-      if (scheduled.length) {
-        const links = scheduled.map((e) => `${e.name}: ${e.meet_link || "no link"}`);
-        msg += ` — ${links.join("; ")}`;
-      }
+      if (data.interview_names?.length) msg += ` — ${data.interview_names.join(", ")}`;
       if (data.errors?.length) msg += ` — ${data.errors[0]}`;
-      setStatus(status, msg, data.errors?.length ? "warn" : "ok");
+      setStatus(rescoreStatus, msg, data.errors?.length ? "warn" : "ok");
       render(data.candidates);
-      if (data.summary?.scheduled > 0 || data.summary?.skipped > 0) completeStep(13);
+      if (data.summary?.interview > 0 || data.summary?.emails_sent > 0) completeStep(11, false);
     } catch (e) {
-      setStatus(status, e.message, "err");
+      setStatus(rescoreStatus, e.message, "err");
     } finally {
       btn.disabled = false;
-      setLoading(13, false);
-    }
-  }
-
-  async function runSendInterviewEmails() {
-    const status = $("interviewEmailStatus");
-    const btn = $("sendInterviewEmailsBtn");
-    setLoading(14, true);
-    btn.disabled = true;
-    try {
-      const data = await api("/api/send-interview-emails", { method: "POST" });
-      let msg = data.message;
-      if (data.summary?.not_scheduled) {
-        msg += " — schedule candidates in Step 13 first.";
-      }
-      if (data.errors?.length) msg += ` — ${data.errors[0]}`;
-      setStatus(status, msg, data.errors?.length || data.summary?.not_scheduled ? "warn" : "ok");
-      render(data.candidates);
-      if (data.summary?.sent > 0 || data.summary?.skipped > 0) completeStep(14);
-    } catch (e) {
-      setStatus(status, e.message, "err");
-    } finally {
-      btn.disabled = false;
-      setLoading(14, false);
-    }
-  }
-
-  function updateGoogleUI(data) {
-    const btn = $("googleAuthBtn");
-    const status = $("googleAuthStatus");
-    const info = $("googleConnectedInfo");
-    const redirectHint = $("googleRedirectHint");
-    if (!btn || !status) return;
-
-    if (redirectHint && data?.redirect_uri) {
-      redirectHint.innerHTML =
-        `If Google shows <strong>redirect_uri_mismatch</strong>, add this exact URI in ` +
-        `Google Cloud Console → Credentials → your OAuth client → Authorized redirect URIs:<br>` +
-        `<code>${esc(data.redirect_uri)}</code> ` +
-        `(also add <code>http://localhost:5000/auth/google/callback</code> if you use localhost)`;
-    }
-
-    if (data?.connected) {
-      btn.textContent = "Connected";
-      btn.disabled = true;
-      setStatus(status, data.email ? `Signed in as ${data.email}` : "Google connected", "ok");
-      if (info) {
-        info.textContent = "Calendar access granted. Ready for interview scheduling.";
-        info.classList.remove("hidden");
-      }
-      completeStep(12, false);
-    } else {
-      btn.textContent = "Connect Google Account";
-      btn.disabled = false;
-      if (info) info.classList.add("hidden");
-    }
-  }
-
-  async function refreshGoogleStatus() {
-    try {
-      const data = await api("/api/google/status");
-      updateGoogleUI(data);
-      return data;
-    } catch {
-      return null;
+      setLoading(11, false);
     }
   }
 
@@ -669,27 +578,6 @@
     }
 
     $("rescoreBtn")?.addEventListener("click", runRescore);
-    $("scheduleBtn")?.addEventListener("click", runSchedule);
-    $("sendInterviewEmailsBtn")?.addEventListener("click", runSendInterviewEmails);
-
-    $("googleAuthBtn")?.addEventListener("click", () => {
-      window.location.href = "/auth/google";
-    });
-
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("google") === "connected") {
-      goToStep(12);
-      setStatus($("googleAuthStatus"), "Google connected successfully.", "ok");
-      history.replaceState({}, "", "/");
-    } else if (params.get("google") === "error") {
-      goToStep(12);
-      setStatus(
-        $("googleAuthStatus"),
-        "Google sign-in failed (redirect_uri_mismatch?). Add the redirect URI shown below in Google Cloud Console, save, wait 1–2 min, then retry.",
-        "err"
-      );
-      history.replaceState({}, "", "/");
-    }
 
     $("remarksClose")?.addEventListener("click", closeRemarksPopover);
     document.addEventListener("click", (e) => {
@@ -727,15 +615,13 @@
       fetch("/api/candidates", fetchOpts).then((r) => r.json()).catch(() => ({})),
       fetch("/api/jd", fetchOpts).then((r) => r.json()).catch(() => ({})),
       fetch("/api/pipeline", fetchOpts).then((r) => r.json()).catch(() => ({})),
-      fetch("/api/google/status", fetchOpts).then((r) => r.json()).catch(() => ({})),
-    ]).then(([candData, jdData, pipeData, googleData]) => {
+    ]).then(([candData, jdData, pipeData]) => {
       if (candData.candidates?.length) render(candData.candidates);
       if (jdData.jd) {
         $("jdInput").value = jdData.jd;
         setStatus($("jdStatus"), `Saved (${jdData.length} chars)`, "ok");
       }
       syncFromPipeline(pipeData);
-      updateGoogleUI(googleData);
     });
   }
 
